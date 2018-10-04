@@ -1,18 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-br">
   <head>
-  	<link rel="stylesheet" href="started.css">
-    <script type="text/javascript" src="pesoCalota.js"></script>
-    <meta http-equiv="Content-Type" content="text/html"; charset="utf-8">
+  	<!--link rel="stylesheet" href="started.css">
+    <script type="text/javascript" src="pesoCalota.js"></script-->
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+
+    <!-- Código de Estilo -->
+    <style>
+        Titulo {
+            display: block;
+        padding: 0px;
+        font-size: 25px;
+        font-family: "Calibri";
+        }
+
+        body {
+            font-family: "Calibri";
+            /*background-color: chartreuse;*/
+        }
+
+        #entradas {
+            /*Novamente definimos a largura da div*/
+            width:25%;
+            /* altura da div */
+            height:100%;
+            /* O atributo Float é utilizado para fazermos o nosso bloco(div) literalmente flutue e se posicione onde queremos na página, quando escolhemos left, dizemos que esse bloco irá se posicionar na parte esquerda da página */
+            float:left;
+            /* Cor de fundo da div
+            background-color:#FF0;*/
+        }
+
+        #imagem {
+            /*Novamente definimos a largura da div*/
+            width:75%;
+            /* altura da div */
+            height:100%;
+            /* Pode parecer meio estranho usarmos o mesmo atributo left para o bloco em que queremos posicionar na direita, mas como sabemos, o CSS é um estilo em cascata, nossa div conteúdo definimos a largura de 1000px e na conteudo-left 500px, 
+            automaticamente ao definirmos o conteudo-right com 500px e à esquerda também, ele ficou à direita do conteudo-left, pois o máximo que a div filha poderá ter é 1000px, sendo 500+500=1000px */
+            float:left;
+            /* Cor de fundo da div */
+            /*background-color: chartreuse;*/
+        }
+    </style>
+
+    <!-- Codigo JavaScript -->
+    <script>
+        var diametroExterno, diametroFuro, altura, raioEsferico, peso, pesoGalv;
+
+        function Peso () {
+        this.peso = (PesoRaio(this.diametroExterno) + PesoReto(this.diametroExterno)) - 
+                (PesoRaio(this.diametroFuro) + PesoReto(this.diametroFuro));
+        }
+
+        function PesoRaio(diametro) {
+            let pesoRaio = VolumeEsferico(diametro) * 7850 * Math.pow(10, -9);
+
+            return pesoRaio;
+        }
+
+        function AlturaRaio(raio, diametro) {
+            let alturaRaio = raio - Math.sqrt(Math.pow(raio, 2) - Math.pow(diametro / 2, 2));
+
+            return alturaRaio;
+        }
+
+        function VolumeEsferico(diametro) {
+            let alturaRaio = AlturaRaio(this.raioEsferico, diametro);
+
+            let	volumeEsferico = Math.PI * Math.pow(alturaRaio, 2) * (3 * this.raioEsferico - alturaRaio) / 3;
+
+            return volumeEsferico;
+        }
+
+        function PesoReto(diametro) {
+            let areaBase = Math.PI * Math.pow(diametro / 2, 2);
+            let alturaReta = this.altura - AlturaRaio(this.raioEsferico, diametro);
+            let pesoReto = (alturaReta * areaBase) * 7850 * Math.pow(10, -9);
+
+            return pesoReto;
+        }
+
+        function PesoGalv() {
+            let areaTotalCalota = 2 * Math.PI * this.raioEsferico * AlturaRaio(this.raioEsferico, this.diametroExterno);
+            let areaFuroCalota = 2 * Math.PI * this.raioEsferico * AlturaRaio(this.raioEsferico, this.diametroFuro);
+            let areaRealCalota = areaTotalCalota - areaFuroCalota;
+
+            let areaBaseTotal = Math.PI * Math.pow(this.diametroExterno / 2, 2);
+            let areaBaseFuro = Math.PI * Math.pow(this.diametroFuro / 2, 2);
+            let areaBaseReal = areaBaseTotal - areaBaseFuro;
+
+            let perimetroFuro = 2 * Math.PI * this.diametroFuro / 2;
+            let areaInternaFuro = perimetroFuro * (this.altura - AlturaRaio(this.raioEsferico, this.diametroFuro));
+
+            let perimetroExterno = 2 * Math.PI * this.diametroExterno / 2;
+            let areaExterna = perimetroExterno * (this.altura - AlturaRaio(this.raioEsferico, this.diametroExterno));
+
+            let areaTotal = areaRealCalota + areaBaseReal + areaInternaFuro + areaExterna;
+
+            return areaTotal * 0.000000357;
+        }
+
+        function CalculoPeso() {
+        this.diametroExterno = parseFloat(document.getElementById('diametroExterno').value);
+        this.diametroFuro = parseFloat(document.getElementById('diametroFuro').value);
+        this.altura = parseFloat(document.getElementById('altura').value);
+        this.raioEsferico = parseFloat(document.getElementById('raioEsferico').value);
+
+            if (Verifica()) {
+                Peso();
+                document.getElementById("resultadoPreto").innerHTML = "Peso: " + peso.toFixed(6) + "kg";
+                document.getElementById("galv").innerHTML = "Peso galvanização: " + PesoGalv().toFixed(6) + "kg";
+
+                let pesoGeral = peso + PesoGalv();
+
+                document.getElementById("pesoTotal").innerHTML = "Peso total: " + pesoGeral.toFixed(6) + "kg";
+            } else {
+                alert("Todos os campos devem ser preenchidos!");
+            }
+        }
+
+        function Verifica() {
+            if  (isNaN(this.diametroFuro) || isNaN(this.diametroExterno) ||
+                isNaN(this.altura) || isNaN(this.raioEsferico)) {
+                return false;
+            } else {
+                return true;
+                }
+        }
+    </script>
   </head>
   <body>
-  	<Titulo><b>Cálculo Calota</b></Titulo><br>
+    <div id="entradas">
+        <Titulo><b>Cálculo Calota</b></Titulo><br>
 
-    Diâmetro Externo: <input type="text" id="diametroExterno" ><br><br>
-    Diâmetro Furo: <input type="text" id="diametro"><br><br>
-    Altura: <input type="text" id="altura"><br><br>
-    Raio Esférico: <input type="text" id="raioEsferico"><br><br>
-    <button onclick="CalculoPeso()" id="calc">Calcular</button>
-    <p id="resultado">Peso:</p>
+        Diâmetro Externo: <input type="text" id="diametroExterno" ><br><br>
+        Diâmetro Furo: <input type="text" id="diametroFuro"><br><br>
+        Altura: <input type="text" id="altura"><br><br>
+        Raio Esférico: <input type="text" id="raioEsferico"><br><br>
+        <button onclick="CalculoPeso()" id="calc">Calcular</button>
+        <p id="resultadoPreto">Peso preto:</p>
+        <p id="galv">Peso galvanização:</p>
+        <P id="pesoTotal">Peso total:</p>
+    </div>
+
+    <div id="imagem">
+        <img src="Calota.JPG">
+    </div>
   </body>
 </html>
